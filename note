@@ -1,0 +1,23 @@
+Video link: https://podcast.ucsd.edu/watch/fa24/cse29_a00/18
+
+malloc + free - how do they work?
+They are C code.
+
+On each malloc or free, store metadata about allocations, and metadata is soted on the heap.
+Malloc will create "blocks" on the heap. Each block will have a special first 8bytes called "header".
+Header stores (a) the size of the block + (b) if block is "free" or "busy".-> 4bytes for free(Least significant bit is 0 or 1(free or not).) and 4bytes for size. 
+Invariant: all blocks start on an 8-byte boundary(all sizes are 8n), so all sizes end in 000.
+
+Size is 64-bit unsigned number.
+Free/busy is the least significant bit = 1->busy.
+
+busy block of 17 -> malloc(16) 
+busy block of 25 -> malloc(20) because rounded up to 24(8n) and header takes 1 byte
+
+Heap size 400 bytes
+
+Initial heap:   |392|...
+a = malloc(40)  |41|data|data|data|data|data|344|...
+                   ↑a points here
+b = malloc(10)  |41|data|data|data|data|data|17|data|data|320|...
+start at beginning of heap + search for free block
