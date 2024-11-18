@@ -21,3 +21,6 @@ e = malloc(12)  |41|data|data|data|data|data|17|data|data|25|data|data|data|33|d
   → If there's no space to split, it does not have to.
 ・We never clear the old data
 ・Allocating e (malloc(12) we did not set up any new free blocks)
+・realloc? → d can just expand the data(if enough space in current block + free blocks after), but for example a, has to free data and malloc in a bigger space again.
+
+If there are contiguous free blocks, it'll be consolidated/combined when malloc.
