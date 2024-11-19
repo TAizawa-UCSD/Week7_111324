@@ -28,9 +28,13 @@ void* my_malloc(size_t size){
       *current = rounded + 1;
 
       //what if remianing is close to 0/8/16, etc
-      size_t remaining = cur_size - (rounded + VAL_SIZE);
-      uint64_t* remaining_ptr = current + (rounded / VAL_SIZE) + 1;
-      *remaining_ptr = remaining;
+      
+      if((cur_size - 16) >= (rounded + VAL_SIZE)){
+        size_t remaining = cur_size - (rounded + VAL_SIZE);
+        uint64_t* remaining_ptr = current + (rounded / VAL_SIZE) + 1;
+        *remaining_ptr = remaining;
+      }
+
       return current + 1;
     } else {
       uint64_t* next = current + (cur_size / VAL_SIZE) + 1;
@@ -40,17 +44,43 @@ void* my_malloc(size_t size){
   return NULL;
 }
 
+//Week8 11/18/24
+void print_heap(){
+  uint64_t *current = HEAP_START;
+  while(current < (HEAP_START + (HEAP_SIZE/VAL_SIZE))){
+    uint64_t cur_header = *current; //We want to know (a) size and (b) if it's free
+    uint64_t cur_size = (cur_header / 2) * 2;
+    printf("%p\t%ld\t%ld\n", current, cur_header % 2, cur_size);
+    uint64_t* next = current + (cur_size / VAL_SIZE) + 1;
+    current = next;
+  }
+}
+
+void my_free(void* p){
+  uint64_t* current = p;
+  uint64_t* header = current - 1;
+  if(*header % 2 == 1){  // This check wold be valgrind reporting double free
+    *header = *header - 1;
+  }
+
+}
+
 
 int main(){
 
   init_heap();
   int* a = my_malloc(40);
-  printf("%lu %lu %lu\n", HEAP_START[0], HEAP_START[1], HEAP_START[6]);
+  //printf("%lu %lu %lu\n", HEAP_START[0], HEAP_START[1], HEAP_START[6]);
   int* b = my_malloc(10);
-  printf("%lu %lu %lu\n", HEAP_START[0], HEAP_START[1], HEAP_START[9]);
-  int* c = my_malloc(321);
-  printf("%p\n",c);
-  // int* b = my_malloc(10);
-  
+  //printf("%lu %lu %lu\n", HEAP_START[0], HEAP_START[1], HEAP_START[9]);
+  int* c = my_malloc(20);
+  my_free(b);
+  print_heap();
+  //printf("%p\n",c);
+  int* d = my_malloc(30);
+  print_heap();
+
+  int* e = my_malloc(12);
+  print_heap();
   
 }
